@@ -53,8 +53,6 @@ export const routes = [
       const { id } = req.params;
       const oldTask = database.select('tasks', { id })[0];
 
-      console.log(oldTask);
-
       if (oldTask === undefined) {
         return res.writeHead(404).end();
       }
@@ -81,6 +79,30 @@ export const routes = [
         completed_at: oldTask.completed_at,
         created_at: oldTask.created_at,
         updated_at: new Date(),
+      });
+      return res.writeHead(204).end();
+    },
+  },
+  {
+    method: 'PATCH',
+    path: buildRoutePath('/tasks/:id/complete'),
+    handler: (req, res) => {
+      const { id } = req.params;
+
+      const oldTask = database.select('tasks', { id })[0];
+
+      if (oldTask === undefined) {
+        return res.writeHead(404).end();
+      }
+
+      const isTaskCompleted = oldTask.completed_at !== null;
+
+      database.update('tasks', id, {
+        title: oldTask.title,
+        description: oldTask.description,
+        completed_at: isTaskCompleted ? null : new Date(),
+        created_at: oldTask.created_at,
+        updated_at: oldTask.updated_at,
       });
       return res.writeHead(204).end();
     },
